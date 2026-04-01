@@ -5,8 +5,8 @@ import {
   Clock, CheckCircle2, AlertTriangle, Truck
 } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
-import { useTrackingStore } from '@/lib/store';
+import { STATUS_LABELS, STATUS_COLORS } from '@/lib/easypost';
+• import type { TrackingData } from '@/lib/easypost';
 import { STATUS_LABELS, STATUS_COLORS } from '@/lib/aftership';
 import { formatDate, cn } from '@/lib/utils';
 import Link from 'next/link';
