@@ -1,203 +1,127 @@
 'use client';
 import { useState } from 'react';
-import { Settings, Key, Database, Activity, Terminal, Check, Copy, Eye, EyeOff } from 'lucide-react';
+// FIXED: Changed barChart3 to BarChart3 to match lucide-react naming conventions
+import { Truck, Shield, Zap, Globe, ArrowRight, Box, BarChart3 } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { useTrackingStore } from '@/lib/store';
-import toast from 'react-hot-toast';
 
-function ConfigRow({ label, value, secret }: { label: string; value: string; secret?: boolean }) {
-  const [show, setShow] = useState(!secret);
-  const [copied, setCopied] = useState(false);
-
-  function handleCopy() {
-    navigator.clipboard.writeText(value);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-    toast.success('Copied!');
-  }
-
-  const display = secret && !show ? '•'.repeat(Math.min(value.length, 32)) : value;
-
-  return (
-    <div className="flex items-center justify-between gap-4 py-3.5 border-b border-subtle last:border-0">
-      <div className="min-w-0">
-        <p className="text-xs text-ink-500 mb-0.5">{label}</p>
-        <p className="font-mono text-sm text-ink-200 truncate">{display || '(not set)'}</p>
-      </div>
-      <div className="flex items-center gap-1.5 flex-shrink-0">
-        {secret && (
-          <button onClick={() => setShow(!show)} className="p-1.5 rounded-lg hover:bg-white/5 text-ink-400 hover:text-ink-200 transition-colors">
-            {show ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-          </button>
-        )}
-        <button onClick={handleCopy} className="p-1.5 rounded-lg hover:bg-white/5 text-ink-400 hover:text-signal transition-colors">
-          {copied ? <Check className="w-3.5 h-3.5 text-signal" /> : <Copy className="w-3.5 h-3.5" />}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-export default function AdminPage() {
-  const { savedTrackings, trackingCache } = useTrackingStore();
-  const apiKey = process.env.NEXT_PUBLIC_TRACKING_API_KEY || '';
-  const mapboxKey = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
-  const apiKeySet = apiKey && apiKey !== 'your_aftership_api_key_here';
-  const mapKeySet = mapboxKey && mapboxKey !== 'your_mapbox_token_here';
-
-  const [testResult, setTestResult] = useState<string | null>(null);
-  const [testing, setTesting] = useState(false);
-
-  async function testApiConnection() {
-    setTesting(true);
-    setTestResult(null);
-    try {
-      // Use a known test tracking number
-      const res = await fetch('/api/track?tn=1Z999AA10123456784');
-      const json = await res.json();
-      if (json.error === 'API_KEY_MISSING') {
-        setTestResult('❌ API key not set. Add NEXT_PUBLIC_TRACKING_API_KEY to .env.local');
-      } else if (json.data) {
-        setTestResult('✅ AfterShip API connected successfully!');
-      } else {
-        setTestResult(`⚠️ API connected but returned: ${json.message}`);
-      }
-    } catch {
-      setTestResult('❌ Network error — is the dev server running?');
+const CONTENT = {
+  hero: {
+    title: "Global Logistics. Local Precision.",
+    subtitle: "Infrastructure for modern commerce. Real-time tracking, automated labeling, and multi-carrier intelligence powered by EasyPost.",
+    cta: "Track Shipment",
+    secondary: "Client Portal"
+  },
+  stats: [
+    { label: "Uptime SLA", value: "99.9%" },
+    { label: "API Response", value: "250ms" },
+    { label: "Daily Shipments", value: "10k+" }
+  ],
+  features: [
+    {
+      icon: <Zap className="w-6 h-6 text-blue-500" />,
+      title: "Instant Webhooks",
+      description: "No more manual refreshing. Receive push updates the millisecond a package scans in the EasyPost network."
+    },
+    {
+      icon: <Globe className="w-6 h-6 text-blue-500" />,
+      title: "Multi-Carrier Sync",
+      description: "Unified tracking across USPS, UPS, FedEx, and 100+ global partners through a single API endpoint."
+    },
+    {
+      icon: <Shield className="w-6 h-6 text-blue-500" />,
+      title: "Encrypted Chain",
+      description: "Every milestone is time-stamped and verified via secure enterprise-grade API protocols."
     }
-    setTesting(false);
-  }
+  ]
+};
+
+export default function LogisticsPage() {
+  const [trackingId, setTrackingId] = useState('');
+
+  const handleTrack = () => {
+    if (!trackingId) return;
+    window.location.href = `https://www.easypost.com/tracking/${trackingId}`;
+  };
 
   return (
-    <div className="min-h-screen bg-ink-900">
+    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-100">
       <Navbar />
-      <div className="max-w-5xl mx-auto px-6 pt-28 pb-20">
-        {/* Header */}
-        <div className="mb-10">
-          <p className="section-label mb-1">Admin Panel</p>
-          <h1 className="font-display text-3xl font-bold">System Configuration</h1>
-        </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* API Status */}
-          <div className="card">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-9 h-9 rounded-xl bg-signal/10 flex items-center justify-center">
-                <Key className="w-4 h-4 text-signal" />
-              </div>
-              <h2 className="font-display font-semibold text-lg">API Configuration</h2>
+      <section className="relative pt-32 pb-20 px-6 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+          <div className="relative z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold tracking-widest uppercase mb-6">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+              </span>
+              EasyPost Infrastructure Active
             </div>
+            <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tighter leading-[1.1] mb-6">
+              {CONTENT.hero.title}
+            </h1>
+            <p className="text-lg text-slate-500 leading-relaxed max-w-xl mb-10">
+              {CONTENT.hero.subtitle}
+            </p>
 
-            <div className="space-y-1">
-              <div className="flex items-center justify-between py-2.5 border-b border-subtle">
-                <span className="text-sm text-ink-400">AfterShip API Key</span>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-mono ${apiKeySet ? 'bg-signal/10 text-signal' : 'bg-red-500/10 text-red-400'}`}>
-                  {apiKeySet ? '● Active' : '● Not Set'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between py-2.5 border-b border-subtle">
-                <span className="text-sm text-ink-400">Mapbox Token</span>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-mono ${mapKeySet ? 'bg-signal/10 text-signal' : 'bg-red-500/10 text-red-400'}`}>
-                  {mapKeySet ? '● Active' : '● Not Set'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between py-2.5">
-                <span className="text-sm text-ink-400">API Endpoint</span>
-                <span className="text-xs font-mono text-ink-400">api.aftership.com/v4</span>
-              </div>
-            </div>
-
-            <button
-              onClick={testApiConnection}
-              disabled={testing}
-              className="btn-secondary w-full mt-5 justify-center text-sm"
-            >
-              <Activity className="w-3.5 h-3.5" />
-              {testing ? 'Testing...' : 'Test API Connection'}
-            </button>
-
-            {testResult && (
-              <div className="mt-3 p-3 glass rounded-xl border border-subtle">
-                <p className="text-xs font-mono">{testResult}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Store stats */}
-          <div className="card">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-9 h-9 rounded-xl bg-signal/10 flex items-center justify-center">
-                <Database className="w-4 h-4 text-signal" />
-              </div>
-              <h2 className="font-display font-semibold text-lg">Data Store</h2>
-            </div>
-
-            <div className="space-y-0">
-              {[
-                { label: 'Saved Trackings', value: savedTrackings.length.toString() },
-                { label: 'Cached Results', value: Object.keys(trackingCache).length.toString() },
-                { label: 'Storage Type', value: 'localStorage (client)' },
-                { label: 'API Provider', value: 'AfterShip v4' },
-                { label: 'Map Provider', value: 'Mapbox GL JS v3' },
-                { label: 'Invoice Engine', value: 'jsPDF + AutoTable' },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex items-center justify-between py-2.5 border-b border-subtle last:border-0">
-                  <span className="text-sm text-ink-400">{label}</span>
-                  <span className="text-sm font-mono text-ink-200">{value}</span>
-                </div>
-              ))}
+            <div className="flex flex-col sm:flex-row gap-3 p-2 bg-white border border-slate-200 rounded-2xl shadow-2xl shadow-blue-500/10 max-w-lg">
+              <input 
+                type="text" 
+                placeholder="Enter EasyPost Tracking ID (e.g. EZ100...)"
+                className="flex-1 px-6 py-4 outline-none text-slate-700 bg-transparent font-medium"
+                value={trackingId}
+                onChange={(e) => setTrackingId(e.target.value)}
+              />
+              <button 
+                onClick={handleTrack}
+                className="bg-slate-900 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-600 transition-all active:scale-95 flex items-center justify-center gap-2"
+              >
+                {CONTENT.hero.cta} <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
 
-          {/* Setup instructions */}
-          <div className="card md:col-span-2">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-9 h-9 rounded-xl bg-signal/10 flex items-center justify-center">
-                <Terminal className="w-4 h-4 text-signal" />
-              </div>
-              <h2 className="font-display font-semibold text-lg">Setup Instructions</h2>
-            </div>
-
-            <div className="space-y-5 text-sm">
-              <div>
-                <p className="text-signal font-mono text-xs mb-2">STEP 1 — Create .env.local</p>
-                <div className="bg-ink-800 rounded-xl p-4 font-mono text-xs text-ink-300 space-y-1">
-                  <p className="text-ink-500"># .env.local — never commit this file</p>
-                  <p>NEXT_PUBLIC_TRACKING_API_KEY=<span className="text-signal">your_aftership_key</span></p>
-                  <p>NEXT_PUBLIC_MAPBOX_TOKEN=<span className="text-signal">your_mapbox_token</span></p>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-signal font-mono text-xs mb-2">STEP 2 — Get AfterShip API Key</p>
-                <ol className="text-ink-400 space-y-1 list-decimal list-inside">
-                  <li>Go to <a href="https://admin.aftership.com" target="_blank" className="text-signal underline">admin.aftership.com</a></li>
-                  <li>Create a free account</li>
-                  <li>Go to Settings → API Keys</li>
-                  <li>Copy your key into NEXT_PUBLIC_TRACKING_API_KEY</li>
-                </ol>
-              </div>
-
-              <div>
-                <p className="text-signal font-mono text-xs mb-2">STEP 3 — Get Mapbox Token (optional, for maps)</p>
-                <ol className="text-ink-400 space-y-1 list-decimal list-inside">
-                  <li>Go to <a href="https://account.mapbox.com/access-tokens/" target="_blank" className="text-signal underline">account.mapbox.com/access-tokens</a></li>
-                  <li>Create or copy your default public token</li>
-                  <li>Paste into NEXT_PUBLIC_MAPBOX_TOKEN</li>
-                </ol>
-              </div>
-
-              <div>
-                <p className="text-signal font-mono text-xs mb-2">STEP 4 — Restart dev server</p>
-                <div className="bg-ink-800 rounded-xl p-3 font-mono text-xs text-ink-300">
-                  npm run dev
-                </div>
-              </div>
-            </div>
+          <div className="relative lg:ml-auto">
+            <div className="absolute -inset-4 bg-gradient-to-tr from-blue-100 to-transparent rounded-[3rem] -z-10"></div>
+            <img 
+              src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=1000" 
+              alt="Logistics Hub" 
+              className="rounded-[2.5rem] shadow-2xl object-cover h-[500px] w-full"
+            />
           </div>
         </div>
-      </div>
+      </section>
+
+      <section className="bg-slate-50 border-y border-slate-100 py-12">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+            {CONTENT.stats.map((stat, i) => (
+              <div key={i} className="text-center md:text-left">
+                <p className="text-3xl font-black text-slate-900 mb-1">{stat.value}</p>
+                <p className="text-sm font-semibold text-slate-400 uppercase tracking-widest">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-24 px-6 max-w-7xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-12">
+          {CONTENT.features.map((feature, i) => (
+            <div key={i} className="group p-8 rounded-3xl bg-white border border-slate-100 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300">
+              <div className="mb-6 p-4 inline-block rounded-2xl bg-slate-50 group-hover:bg-blue-50 transition-colors">
+                {feature.icon}
+              </div>
+              <h3 className="text-xl font-bold mb-4">{feature.title}</h3>
+              <p className="text-slate-500 leading-relaxed text-sm">
+                {feature.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <Footer />
     </div>
   );
