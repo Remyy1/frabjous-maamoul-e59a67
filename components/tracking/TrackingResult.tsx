@@ -5,13 +5,12 @@ import {
   Truck, Home, RotateCcw, FileText, ChevronDown, ChevronUp,
   Star, ArrowRight
 } from 'lucide-react';
-import { STATUS_LABELS, STATUS_COLORS } from '@/lib/aftership';
+import { STATUS_LABELS, STATUS_COLORS } from '@/lib/easypost';
 import { formatDate, formatDateTime, cn } from '@/lib/utils';
 import { generateInvoicePDF } from '@/lib/invoice';
 import { useTrackingStore } from '@/lib/store';
 import toast from 'react-hot-toast';
-import type { TrackingData } from '@/lib/aftership';
-
+import type { TrackingData } from '@/lib/easypost';
 interface Props {
   data: TrackingData;
   onReset: () => void;
