@@ -5,13 +5,13 @@ import {
   Clock, CheckCircle2, AlertTriangle, Truck
 } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 import { STATUS_LABELS, STATUS_COLORS } from '@/lib/easypost';
-• import type { TrackingData } from '@/lib/easypost';
-import { STATUS_LABELS, STATUS_COLORS } from '@/lib/aftership';
 import { formatDate, cn } from '@/lib/utils';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import type { TrackingData } from '@/lib/aftership';
+import type { TrackingData } from '@/lib/easypost';
+import { useTrackingStore } from '@/lib/store';
 
 function StatCard({ label, value, icon: Icon, color }: any) {
   return (

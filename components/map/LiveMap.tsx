@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { MapPin, Navigation } from 'lucide-react';
-import type { TrackingData } from '@/lib/aftership';
+import type { TrackingData } from '@/lib/easypost';
 import { CITY_COORDS, simulateRoute } from '@/lib/utils';
 
 interface Props {
